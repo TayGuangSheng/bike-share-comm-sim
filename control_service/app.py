@@ -51,3 +51,5 @@ async def ack(cmd_id: str, req: Request):
     with get_conn() as conn:
         ack_command(conn, cmd_id, ok=(status=="ok"))
     return {"ok": True, "id": cmd_id}
+
+#sahdasjd
