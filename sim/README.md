@@ -1,0 +1,2 @@
+- Device simulator pushes telemetry with Idempotency-Key + retries (exp backoff + jitter).
+- Loadgen produces CSV to compute p50/p95/p99.

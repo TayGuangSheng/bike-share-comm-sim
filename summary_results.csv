@@ -1,0 +1,13 @@
+file,total,success,timeout,other,p50_ms,p95_ms,p99_ms,label
+fastapi_c10.csv,500,500,0,0,16,20,297,FastAPI-C10-Baseline
+fastapi_c100.csv,2000,2000,0,0,296,386,567,FastAPI-C100-Baseline
+fastapi_c50.csv,1000,1000,0,0,281,350,416,FastAPI-C50-Baseline
+fastapi_impair_c10.csv,500,499,1,0,599,1558,2627,FastAPI-C10-Impaired
+fastapi_impair_c100.csv,2000,1983,17,0,1425,3554,4792,FastAPI-C100-Impaired
+fastapi_impair_c50.csv,1000,991,9,0,1494,3548,4460,FastAPI-C50-Impaired
+flask_c10.csv,500,500,0,0,264,283,287,Flask-C10-Baseline
+flask_c100.csv,2000,2000,0,0,299,385,531,Flask-C100-Baseline
+flask_c50.csv,1000,1000,0,0,281,348,372,Flask-C50-Baseline
+flask_impair_c10.csv,500,497,3,0,961,3090,4780,Flask-C10-Impaired
+flask_impair_c100.csv,2000,1991,9,0,920,2741,4256,Flask-C100-Impaired
+flask_impair_c50.csv,1000,986,14,0,880,2910,4814,Flask-C50-Impaired

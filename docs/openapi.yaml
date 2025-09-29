@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info: { title: Comms-First Micromobility (Bike-Share) REST API, version: "1.0.0" }
+servers: [ { url: http://localhost:8000 }, { url: http://localhost:5000 } ]
+paths:
+  /healthz: { get: { summary: Health, responses: { "200": { description: OK } } } }
+  /metrics: { get: { summary: Metrics, responses: { "200": { description: OK } } } }
+  /devices:
+    post:
+      summary: Register device (idempotent)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [id,name], properties: { id: {type: string}, name: {type: string} } } } } }
+      responses: { "201": {description: Created }, "200": {description: Existing} }
+    get:
+      summary: List devices near lat,lon
+      parameters:
+        - { in: query, name: near, schema: {type: string}, description: "lat,lon" }
+        - { in: query, name: page, schema: {type: integer, default: 1} }
+        - { in: query, name: limit, schema: {type: integer, default: 20} }
+      responses: { "200": { description: OK } }
+  /devices/{id}:
+    get: { summary: Device detail, parameters: [ {in: path, name: id, required: true, schema: {type: string} } ], responses: { "200": {description: OK} } }
+    put:
+      summary: Update device metadata
+      parameters: [ { in: path, name: id, required: true, schema: {type: string} } ]
+      requestBody: { content: { application/json: { schema: { type: object, properties: { name: {type: string}, lock_state: {type: string, enum: [locked,unlocked]} } } } } }
+      responses: { "200": { description: OK } }
+  /devices/{id}/telemetry:
+    post:
+      summary: Post telemetry (app-layer ARQ)
+      parameters: [ { in: header, name: Idempotency-Key, required: true, schema: {type: string} } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { seq: {type: integer}, lat: {type: number}, lon: {type: number}, battery: {type: number}, lock_state: {type: string} } } } }
+      responses: { "201": {description: ACK}, "409": {description: Duplicate NACK}, "429": {description: Rate limited} }
+  /devices/{id}/unlock: { post: { summary: Unlock, responses: { "200": {description: OK}, "429": {description: Rate limited} } } }
+  /devices/{id}/lock:   { post: { summary: Lock,   responses: { "200": {description: OK}, "429": {description: Rate limited} } } }
+  /rides:
+    post:
+      summary: Start ride (idempotent by id)
+      requestBody: { content: { application/json: { schema: { type: object, required: [id,user_id,device_id,start_lat,start_lon], properties: { id:{type:string}, user_id:{type:string}, device_id:{type:string}, start_lat:{type:number}, start_lon:{type:number} } } } } }
+      responses: { "201": {description: Created}, "200": {description: Existing}, "429": {description: Rate limited} }
+  /rides/{id}:
+    get:   { summary: Ride detail, parameters: [ {in: path, name: id, required: true, schema: {type: string}} ], responses: { "200": {description: OK} } }
+    patch:
+      summary: End ride
+      requestBody: { content: { application/json: { schema: { type: object, required: [end_lat,end_lon], properties: { end_lat:{type:number}, end_lon:{type:number} } } } } }
+      responses: { "200": {description: Ended}, "429": {description: Rate limited} }
+  /route/plan:
+    post:
+      summary: Grid route + ETA (weather-adjusted)
+      requestBody: { content: { application/json: { schema: { type: object, required: [from,to], properties: { from: {type: object}, to: {type: object} } } } } }
+      responses: { "200": { description: OK } }
+  /policies/geofences:
+    get:
+      summary: Geofences with ETag
+      parameters: [ { in: header, name: If-None-Match, schema: {type: string} } ]
+      responses: { "200": {description: JSON + ETag}, "304": {description: Not Modified} }
+  /policies/pricing:
+    get:
+      summary: Pricing with ETag
+      parameters: [ { in: header, name: If-None-Match, schema: {type: string} } ]
+      responses: { "200": {description: JSON + ETag}, "304": {description: Not Modified} }
+  /weather/current:
+    get:
+      summary: Simulated weather
+      parameters: [ {in: query, name: lat, schema: {type:number}}, {in: query, name: lon, schema: {type:number}} ]
+      responses: { "200": {description: OK} }
+  /devices/{id}/history:
+    get:
+      summary: Paged telemetry history
+      parameters: [ {in:path,name:id,required:true,schema:{type:string}}, {in:query,name:start,schema:{type:string}}, {in:query,name:end,schema:{type:string}}, {in:query,name:page,schema:{type:integer}}, {in:query,name:limit,schema:{type:integer}} ]
+      responses: { "200": {description: OK} }

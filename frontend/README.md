@@ -1,0 +1,1 @@
+- Click map to set user location; Refresh to fetch bikes; “Find nearest & route” draws a path and shows ETA with weather factor.
